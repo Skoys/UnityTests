@@ -4,11 +4,14 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Scripting;
-using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject _nearestPlanet;
+
+    [Header("Player")]
+    [SerializeField] GameObject camera;
+    [SerializeField] float speed = 5.0f;
 
     [Header("Physics")]
     [SerializeField] private bool _onGround = true;
@@ -22,16 +25,19 @@ public class Player : MonoBehaviour
     [Header("Ray")]
     [SerializeField] private float _rayDist = 1.0f;
     [SerializeField] private LayerMask _floorLayer;
-    // Start is called before the first frame update
+
+    [Header("Debug")]
+    [SerializeField] private Quaternion debug = new Quaternion();
+
     void Start()
     {
-
+        
     }
 
-    // Update is called once per frame
     void Update()
     {
         PlanetCalculations();
+        InputKeys();
         CheckCollision();
         Gravity();
     }
@@ -45,16 +51,39 @@ public class Player : MonoBehaviour
         
         _downVector = _nearestPlanet.transform.position - transform.position;
     }
+    void InputKeys()
+    {
+        float x = 0;
+        float y = 0;
+        float z = 0;
+        if (Input.GetKey(KeyCode.W)) { z+= speed; }
+        if (Input.GetKey(KeyCode.S)) { z -= speed; }
+        if (Input.GetKey(KeyCode.A)) { x -= speed; }
+        if (Input.GetKey(KeyCode.D)) { x += speed; }
+
+        Vector3 newForward = new Vector3(camera.transform.forward.x, 0, camera.transform.forward.z);
+
+        transform.localPosition += (new Vector3(x, 0, z) + newForward) * Time.deltaTime;
+
+    }
     void Gravity()
     {
         if (!_onGround)
         {
             _velocity += _currentGravity * Time.deltaTime;
             if (_velocity > _velocityMax) { _velocity = _velocityMax; }
-
-            transform.position += _downVector * _velocity * _currentMass * Time.deltaTime;
-            transform.rotation = Quaternion.LookRotation(_downVector, -Vector3.up);
         }
+
+        Vector3 loctoworld = camera.transform.TransformDirection(new Vector3(camera.transform.localRotation.x, 0f, camera.transform.localRotation.z));
+        Vector3 newForward = new Vector3(camera.transform.forward.x, 0, camera.transform.forward.z);
+
+        transform.position += _downVector * _velocity * _currentMass * Time.deltaTime;
+        //transform.rotation = Quaternion.LookRotation(_downVector, -_downVector);
+        transform.rotation = Quaternion.LookRotation(loctoworld, -_downVector);
+        debug = transform.localRotation;
+
+        Debug.DrawRay(camera.transform.position, loctoworld * 10f, Color.green, 0.01f);
+        Debug.DrawRay(transform.position, transform.forward * 10f, Color.green, 0.01f);
     }
     void CheckCollision()
     {

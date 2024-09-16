@@ -3,3 +3,4 @@ Logs
 obj
 .vsconfig
 Assembly-CSharp.csproj
+.vs
