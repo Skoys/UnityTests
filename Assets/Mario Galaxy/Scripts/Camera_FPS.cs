@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Camera_FPS : MonoBehaviour
 {
-    [SerializeField] private GameObject camera;
-    [SerializeField] private float sensitivity = 1.0f;
+    [SerializeField] private GameObject _camera;
+    [SerializeField] private float _sensitivity = 1.0f;
 
     void Start()
     {
@@ -18,8 +18,9 @@ public class Camera_FPS : MonoBehaviour
         float rotateHorizontal = Input.GetAxis("Mouse X");
         float rotateVertical = Input.GetAxis("Mouse Y");
 
-        Vector3 rotation = new Vector3(rotateVertical * sensitivity, -rotateHorizontal * sensitivity, 0);
+        Vector3 rotation = new Vector3(rotateVertical * _sensitivity, -rotateHorizontal * _sensitivity, 0);
 
-        camera.transform.eulerAngles -= rotation;
+        _camera.transform.localEulerAngles -= rotation;
+        Debug.DrawRay(ray.origin, ray.direction * _rayDist, Color.red, 0.01f);
     }
 }

@@ -11,7 +11,7 @@ public class ObjectGravity : MonoBehaviour
     [Header("Gravity")]
     [SerializeField] private float _objectMass = 1.0f;
     [SerializeField] private bool _grounded;
-    [SerializeField] private float _velocity;
+    public float velocity;
     [SerializeField] private Vector3 _downVector;
 
     [Header("Ray")]
@@ -33,7 +33,7 @@ public class ObjectGravity : MonoBehaviour
             return;
         }
         _downVector = _nearestPlanet.transform.position - transform.position;
-        Debug.DrawRay(transform.position, _downVector * 10f, Color.blue, 0.01f);
+        Debug.DrawRay(transform.position, _downVector * 5f, Color.blue, 0.01f);
     }
 
     void CheckCollision()
@@ -44,8 +44,9 @@ public class ObjectGravity : MonoBehaviour
         if (Physics.Raycast(ray.origin, ray.direction, out hit, _rayDist, _floorLayer))
         {
             _grounded = true;
-            _velocity = 0;
-            transform.position += new Vector3(0, _rayDist - hit.distance - 0.001f);
+            velocity = 0;
+            //transform.localPosition += new Vector3(0, _rayDist - hit.distance - 0.001f);
+            transform.Translate(new Vector3(0, _rayDist - hit.distance - 0.001f), Space.Self);
         }
         else
         {
@@ -59,16 +60,11 @@ public class ObjectGravity : MonoBehaviour
     {
         if (!_grounded)
         {
-            _velocity += _planetGravity * _objectMass * Time.deltaTime;
-            if (_velocity > 100) { _velocity = 100; }
+            velocity += _planetGravity * _objectMass * Time.deltaTime;
+            if (velocity > 100) { velocity = 100; }
         }
 
-        //Vector3 directionDifference = transform.position - _lastPosition;
-
-        transform.position += _downVector * _velocity * _objectMass * Time.deltaTime;
-        //transform.localRotation *= (Quaternion.Euler(_downVector) * Quaternion.Euler(directionDifference));
-        transform.rotation = Quaternion.LookRotation(transform.forward, -_downVector);
-
+        transform.up = -_downVector;
         Debug.DrawRay(transform.position, transform.forward * 10f, Color.green, 0.01f);
     } 
 }

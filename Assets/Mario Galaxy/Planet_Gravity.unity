@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -270,15 +270,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 405466566}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 24.5, z: 0}
+  m_LocalRotation: {x: -0, y: 0.59013766, z: -0, w: 0.8073026}
+  m_LocalPosition: {x: -0.4, y: 21.1, z: 1.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1884188993}
   - {fileID: 963194228}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 72.334, z: 0}
 --- !u!65 &405466568
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -313,10 +313,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _nearestPlanet: {fileID: 480160289}
-  camera: {fileID: 963194225}
-  speed: 5
-  _velocity: 0
-  _velocityMax: 15
+  _camera: {fileID: 963194225}
+  _speed: 5
+  _nextMovement: {x: 0, y: 0, z: 0}
+  _playerGravity: {fileID: 0}
 --- !u!114 &405466571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,8 +329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af5c36de2e882e5488c84fb348cda2ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 963194225}
-  sensitivity: 1
+  _camera: {fileID: 963194225}
+  _sensitivity: 1
 --- !u!114 &405466573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -347,7 +347,7 @@ MonoBehaviour:
   _nearestPlanet: {fileID: 480160289}
   _objectMass: 1
   _grounded: 0
-  _velocity: 0
+  velocity: 0
   _downVector: {x: 0, y: 0, z: 0}
   _rayDist: 1
   _floorLayer:

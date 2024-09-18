@@ -4,27 +4,29 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Scripting;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject _nearestPlanet;
 
     [Header("Player")]
-    [SerializeField] GameObject camera;
-    [SerializeField] float speed = 5.0f;
+    [SerializeField] private GameObject _camera;
+    [SerializeField] private float _speed = 5.0f;
+    [SerializeField] private Vector3 _nextMovement;
 
     [Header("Physics")]
-    [SerializeField] private float _velocity = 0;
-    [SerializeField] private float _velocityMax = 15f;
+    [SerializeField] private ObjectGravity _playerGravity;
 
     void Start()
     {
-        
+        _playerGravity = GetComponent<ObjectGravity>();
     }
 
     void Update()
     {
         InputKeys();
+        Position();
     }
     
     void InputKeys()
@@ -32,14 +34,21 @@ public class Player : MonoBehaviour
         float x = 0;
         float y = 0;
         float z = 0;
-        if (Input.GetKey(KeyCode.W)) { z+= speed; }
-        if (Input.GetKey(KeyCode.S)) { z -= speed; }
-        if (Input.GetKey(KeyCode.A)) { x -= speed; }
-        if (Input.GetKey(KeyCode.D)) { x += speed; }
+        if (Input.GetKey(KeyCode.W)) { z += _speed; }
+        if (Input.GetKey(KeyCode.S)) { z -= _speed; }
+        if (Input.GetKey(KeyCode.A)) { x -= _speed; }
+        if (Input.GetKey(KeyCode.D)) { x += _speed; }
 
-        transform.localPosition += (new Vector3(x, 0, z) + transform.forward) * Time.deltaTime;
-        transform.localRotation = new Quaternion(0, camera.transform.rotation.y, 0, 1);
+        y = -_playerGravity.velocity;
+
+        _nextMovement = new Vector3(x, y, z);
+        
     }
-    
+
+    void Position()
+    {
+        transform.Translate(_nextMovement * Time.deltaTime, Space.Self);
+        transform.rotation = new Quaternion(transform.rotation.x, _camera.transform.rotation.y, transform.rotation.z, transform.rotation.w);
+    }
     
 }
