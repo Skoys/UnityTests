@@ -21,6 +21,5 @@ public class Camera_FPS : MonoBehaviour
         Vector3 rotation = new Vector3(rotateVertical * _sensitivity, -rotateHorizontal * _sensitivity, 0);
 
         _camera.transform.localEulerAngles -= rotation;
-        Debug.DrawRay(_camera.transform.position, _camera.transform.forward * 10f, Color.red, 0.01f);
     }
 }

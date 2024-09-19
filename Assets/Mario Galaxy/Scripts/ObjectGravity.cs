@@ -10,10 +10,10 @@ public class ObjectGravity : MonoBehaviour
 
     [Header("Gravity")]
     public float velocity;
+    public Vector3 _downVector;
 
     [SerializeField] private float _objectMass = 1.0f;
     [SerializeField] private bool _grounded;
-    [SerializeField] private Vector3 _downVector;
 
     [Header("Ray")]
     [SerializeField] private float _rayDist = 1.0f;
@@ -34,7 +34,7 @@ public class ObjectGravity : MonoBehaviour
             return;
         }
         _downVector = _nearestPlanet.transform.position - transform.position;
-        Debug.DrawRay(transform.position, _downVector * 5f, Color.blue, 0.01f);
+        Debug.DrawRay(transform.position, _downVector, Color.blue, 0.01f);
     }
 
     void CheckCollision()
@@ -54,23 +54,22 @@ public class ObjectGravity : MonoBehaviour
             _grounded = false;
         }
 
-        Debug.DrawRay(ray.origin, ray.direction * _rayDist, Color.red, 0.01f);
+        //Debug.DrawRay(ray.origin, ray.direction * _rayDist, Color.red, 0.01f);
     }
 
     void Gravity()
     {
         if (!_grounded)
         {
-            velocity += _planetGravity * _objectMass * Time.deltaTime;
+            velocity -= _planetGravity * _objectMass * Time.deltaTime;
             if (velocity > 100) { velocity = 100; }
         }
 
         transform.up = -_downVector;
-        Debug.DrawRay(transform.position, transform.forward * 10f, Color.green, 0.01f);
     }
 
     public void Jump(float strength)
     {
-        velocity = -strength;
+        velocity = strength;
     }
 }

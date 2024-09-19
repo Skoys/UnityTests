@@ -38,18 +38,19 @@ public class Player : MonoBehaviour
         float x = 0;
         float y = 0;
         float z = 0;
-        if (Input.GetKey(KeyCode.W)) { z += _speedVelocity; }
-        if (Input.GetKey(KeyCode.S)) { z -= _speedVelocity; }
-        if (Input.GetKey(KeyCode.A)) { x -= _speedVelocity; }
-        if (Input.GetKey(KeyCode.D)) { x += _speedVelocity; }
+        float _speedVelDelta = _speedVelocity * Time.deltaTime;
+        if (Input.GetKey(KeyCode.W)) { z += _speedVelDelta; }
+        if (Input.GetKey(KeyCode.S)) { z -= _speedVelDelta; }
+        if (Input.GetKey(KeyCode.A)) { x -= _speedVelDelta; }
+        if (Input.GetKey(KeyCode.D)) { x += _speedVelDelta; }
 
         if (_velocity.y == 0) 
         {
             if (Input.GetKey(KeyCode.Space)) { _playerGravity.Jump(_jumpStrength); }
-            if (x == 0) { _velocity.x = Mathf.MoveTowards(_velocity.x, 0, _speedVelocity); }
-            if (z == 0) { _velocity.z = Mathf.MoveTowards(_velocity.z, 0, _speedVelocity); }
+            if (x == 0) { _velocity.x = Mathf.MoveTowards(_velocity.x, 0, _speedVelDelta); }
+            if (z == 0) { _velocity.z = Mathf.MoveTowards(_velocity.z, 0, _speedVelDelta); }
         }
-        y = -_playerGravity.velocity;
+        y = _playerGravity.velocity;
         _velocity.y = y;
 
         _velocity += (new Vector3(x, 0, z));
@@ -60,14 +61,28 @@ public class Player : MonoBehaviour
     void Position()
     {
         _playerModel.transform.localEulerAngles = new Vector3(0, _camera.transform.localEulerAngles.y);
-        transform.rotation = Quaternion.LookRotation(_playerModel.transform.forward, transform.up);
+        transform.rotation = Quaternion.LookRotation(_playerModel.transform.forward, -_playerGravity._downVector);
+
+        float x = 0;
+        float y = 0;
+        float z = 0;
+        if (transform.eulerAngles.x > 180) { x = transform.eulerAngles.x - 360; }
+        if (transform.eulerAngles.y < -180) { x = transform.eulerAngles.x + 360; }
+        if (transform.eulerAngles.y > 180) { y = transform.eulerAngles.y - 360; }
+        if (transform.eulerAngles.y < -180) { y = transform.eulerAngles.y + 360; }
+        if (transform.eulerAngles.z > 180) { z = transform.eulerAngles.z - 360; }
+        if (transform.eulerAngles.z < -180) { z = transform.eulerAngles.z + 360; }
+        
+        transform.eulerAngles = new Vector3(x != 0 ? x : transform.eulerAngles.x,
+                                                                          y != 0 ? y : transform.eulerAngles.y, 
+                                                                          z != 0 ? z : transform.eulerAngles.z);
+
         _playerModel.transform.localRotation = new Quaternion();
-        //transform.forward = _playerModel.transform.forward;
         transform.Translate(_velocity * Time.deltaTime, Space.Self);
 
-        Debug.DrawRay(transform.position, transform.forward * 5f, Color.blue, 0.01f);
-        Debug.DrawRay(transform.position, -transform.up * 5f, Color.yellow, 0.01f);
-        Debug.DrawRay(transform.position, _nextMovement * 5f, Color.gray, 0.01f);
+        Debug.DrawRay(transform.position, transform.forward * 2f, Color.blue, 0.01f);
+        Debug.DrawRay(transform.position, transform.right * 2f, Color.red, 0.01f);
+        Debug.DrawRay(transform.position, transform.up * 2f, Color.green, 0.01f);
     }
 }
     
