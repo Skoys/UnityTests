@@ -4,3 +4,4 @@ obj
 .vsconfig
 Assembly-CSharp.csproj
 .vs
+Temp

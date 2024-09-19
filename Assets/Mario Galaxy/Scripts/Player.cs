@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
 
     [Header("Player")]
     [SerializeField] private GameObject _camera;
+    [SerializeField] private GameObject _playerModel;
     [SerializeField] private float _speed = 5.0f;
     [SerializeField] private Vector3 _nextMovement;
 
@@ -42,13 +43,19 @@ public class Player : MonoBehaviour
         y = -_playerGravity.velocity;
 
         _nextMovement = new Vector3(x, y, z);
-        
     }
 
     void Position()
     {
+        _playerModel.transform.localEulerAngles = new Vector3(0, _camera.transform.localEulerAngles.y);
+        transform.rotation = Quaternion.LookRotation(_playerModel.transform.forward, transform.up);
+        _playerModel.transform.rotation = new Quaternion();
+        //transform.forward = _playerModel.transform.forward;
         transform.Translate(_nextMovement * Time.deltaTime, Space.Self);
-        transform.rotation = new Quaternion(transform.rotation.x, _camera.transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+        Debug.DrawRay(transform.position, transform.forward * 5f, Color.blue, 0.01f);
+        Debug.DrawRay(transform.position, -transform.up * 5f, Color.yellow, 0.01f);
+        Debug.DrawRay(transform.position, _nextMovement * 5f, Color.gray, 0.01f);
     }
-    
 }
+    
