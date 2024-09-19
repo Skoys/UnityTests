@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -241,7 +241,8 @@ GameObject:
   - component: {fileID: 237990276}
   - component: {fileID: 237990275}
   - component: {fileID: 237990274}
-  m_Layer: 0
+  - component: {fileID: 237990279}
+  m_Layer: 2
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,6 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   quaternion: {x: 0, y: 0, z: 0, w: 1}
+  planet: {fileID: 5790337}
 --- !u!135 &237990275
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -341,12 +343,35 @@ Transform:
   m_GameObject: {fileID: 237990273}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -24.57779, y: 24.91155, z: 41.31}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 24.91155, z: 40.64}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &237990279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237990273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2580c016c153fa4d9cde6200cfe31eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _planetGravity: 9.8
+  _nearestPlanet: {fileID: 5790337}
+  velocity: {x: 0, y: 0, z: 0}
+  downVector: {x: 0, y: 0, z: 0}
+  _objectMass: 1
+  _bounciness: 0.75
+  _grounded: 0
+  _rayDist: 4.95
+  _floorLayer:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &241144101
 GameObject:
   m_ObjectHideFlags: 3
@@ -624,7 +649,6 @@ MonoBehaviour:
   _speed: 5
   _jumpStrength: 5
   _nextMovement: {x: 0, y: 0, z: 0}
-  _velocity: {x: 0, y: 0, z: 0}
   _playerGravity: {fileID: 0}
 --- !u!114 &405466571
 MonoBehaviour:
@@ -654,11 +678,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _planetGravity: 9.8
   _nearestPlanet: {fileID: 480160289}
-  velocity: 0
-  _downVector: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: 0, z: 0}
+  downVector: {x: 0, y: 0, z: 0}
   _objectMass: 1
+  _bounciness: 0
   _grounded: 0
-  _rayDist: 1
+  _rayDist: 0.95
   _floorLayer:
     serializedVersion: 2
     m_Bits: 1
