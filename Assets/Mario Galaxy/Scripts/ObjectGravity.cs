@@ -9,9 +9,10 @@ public class ObjectGravity : MonoBehaviour
     [SerializeField] private GameObject _nearestPlanet;
 
     [Header("Gravity")]
+    public float velocity;
+
     [SerializeField] private float _objectMass = 1.0f;
     [SerializeField] private bool _grounded;
-    public float velocity;
     [SerializeField] private Vector3 _downVector;
 
     [Header("Ray")]
@@ -66,5 +67,10 @@ public class ObjectGravity : MonoBehaviour
 
         transform.up = -_downVector;
         Debug.DrawRay(transform.position, transform.forward * 10f, Color.green, 0.01f);
-    } 
+    }
+
+    public void Jump(float strength)
+    {
+        velocity = -strength;
+    }
 }
