@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -240,7 +239,6 @@ GameObject:
   - component: {fileID: 237990277}
   - component: {fileID: 237990276}
   - component: {fileID: 237990275}
-  - component: {fileID: 237990274}
   - component: {fileID: 237990279}
   m_Layer: 2
   m_Name: Sphere
@@ -249,20 +247,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &237990274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 237990273}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c66d697eadf1f4c4b92548866be18cc2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  quaternion: {x: 0, y: 0, z: 0, w: 1}
-  planet: {fileID: 5790337}
 --- !u!135 &237990275
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -361,10 +345,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2580c016c153fa4d9cde6200cfe31eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _planetMinDist: 0
+  _planetMaxDist: 0
   _planetGravity: 9.8
+  _gravity: 0
   _planetGravDist: 0
-  _nearestPlanet: {fileID: 5790337}
-  _planetScript: {fileID: 0}
+  _nearestPlanet: {fileID: 480160289}
+  _planetScript: {fileID: 480160294}
   grounded: 0
   objectMass: 1
   bounciness: 0
@@ -680,10 +667,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2580c016c153fa4d9cde6200cfe31eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _planetMinDist: 0
+  _planetMaxDist: 0
   _planetGravity: 9.8
+  _gravity: 0
   _planetGravDist: 0
   _nearestPlanet: {fileID: 480160289}
-  _planetScript: {fileID: 0}
+  _planetScript: {fileID: 480160294}
   grounded: 0
   objectMass: 1
   bounciness: 0
@@ -814,8 +804,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7518cc5663bbbc845a7806718ce9636d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minAttraDist: 0
-  maxAttraDist: 0
+  minAttraDist: 15
+  maxAttraDist: 45
   gravity: 9.8
 --- !u!1 &500274491
 GameObject:

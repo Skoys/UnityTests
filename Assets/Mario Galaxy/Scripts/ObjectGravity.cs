@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class ObjectGravity : MonoBehaviour
 {
+
+    [Header("Planets Variables")]
+    [SerializeField] private float _planetMinDist;
+    [SerializeField] private float _planetMaxDist;
+    [SerializeField] private float _planetGravity = 9.8f;
+
     [Header("Planets Calculations")]
-    [SerializeField] private float _planetGravity;
+    [SerializeField] private float _gravity;
     [SerializeField] private float _planetGravDist;
     [SerializeField] private GameObject _nearestPlanet;
     [SerializeField] private PlanetScript _planetScript;
@@ -25,6 +31,9 @@ public class ObjectGravity : MonoBehaviour
     private void Start()
     {
         _planetScript = _nearestPlanet.GetComponent<PlanetScript>();
+        _planetMinDist = _planetScript.minAttraDist;
+        _planetMaxDist = _planetScript.maxAttraDist;
+        _planetGravity = _planetScript.gravity;
     }
 
     void Update()
@@ -45,9 +54,9 @@ public class ObjectGravity : MonoBehaviour
         Debug.DrawRay(transform.position, downVector, Color.blue, 0.01f);
 
         float _playerPosition = Vector3.Distance(_nearestPlanet.transform.position, transform.position);
-        _playerPosition = Mathf.(_playerPosition, _planetScript.maxAttraDist, _planetScript.minAttraDist);
-        _playerPosition = 
-        _planetGravity = _planetScript.gravity * 
+        _playerPosition = Mathf.Clamp(_playerPosition, _planetMaxDist, _planetMinDist);
+        float _playerPosNorm = (_playerPosition - _planetMaxDist) / (_planetMinDist - _planetMaxDist);
+        _gravity = _planetGravity * _playerPosNorm;
     }
 
     void CheckCollision()
@@ -80,7 +89,7 @@ public class ObjectGravity : MonoBehaviour
     {
         if (!grounded)
         {
-            velocity.y -= _planetGravity * objectMass * Time.deltaTime;
+            velocity.y -= _gravity * objectMass * Time.deltaTime;
             if (velocity.y > 100) { velocity.y = 100; }
         }
 
