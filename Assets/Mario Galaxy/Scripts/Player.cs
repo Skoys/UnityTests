@@ -29,7 +29,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         InputKeys();
-        Position();
+        Roation();
     }
     
     void InputKeys()
@@ -42,9 +42,9 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.A)) { x -= _speedVelDelta; }
         if (Input.GetKey(KeyCode.D)) { x += _speedVelDelta; }
 
-        if (_playerGravity.velocity.y == 0) 
+        if (_playerGravity.grounded == true) 
         {
-            if (Input.GetKey(KeyCode.Space)) { _playerGravity.velocity.y = _jumpStrength; }
+            if (Input.GetKey(KeyCode.Space)) { _playerGravity.AddImpulse(new Vector3(0, _jumpStrength, 0)); }
             if (x == 0) { _playerGravity.velocity.x = Mathf.MoveTowards(_playerGravity.velocity.x, 0, _speedVelDelta); }
             if (z == 0) { _playerGravity.velocity.z = Mathf.MoveTowards(_playerGravity.velocity.z, 0, _speedVelDelta); }
         }
@@ -54,12 +54,13 @@ public class Player : MonoBehaviour
         _playerGravity.velocity.z = Mathf.Clamp(_playerGravity.velocity.z, -_speed, _speed);
     }
 
-    void Position()
+    void Roation()
     {
-        _playerModel.transform.localEulerAngles = new Vector3(0, _camera.transform.localEulerAngles.y);
-        transform.forward = _playerModel.transform.forward;
-        _playerModel.transform.localRotation = new Quaternion();
-        _camera.transform.localEulerAngles = new Vector3(_camera.transform.localEulerAngles.x, 0,_camera.transform.localEulerAngles.z);
+        //transform.localEulerAngles = new Vector3(0, _camera.transform.localEulerAngles.y);
+        //_playerModel.transform.localEulerAngles = new Vector3(0, _camera.transform.localEulerAngles.y);
+        //transform.forward = _playerModel.transform.forward;
+        //_playerModel.transform.localRotation = new Quaternion();
+        //_camera.transform.localEulerAngles = new Vector3(_camera.transform.localEulerAngles.x, 0,_camera.transform.localEulerAngles.z);
     }
 }
     
