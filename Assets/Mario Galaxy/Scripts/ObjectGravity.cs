@@ -5,7 +5,15 @@ using UnityEngine;
 public class ObjectGravity : MonoBehaviour
 {
 
+    [Header("Object variable")]
+    public bool rotationAffected = false;
+    public float objectMass = 1.0f;
+    public float bounciness = 0.0f;
+    public float fallOff = 0.0f;
+
     [Header("Planets Variables")]
+    [SerializeField] private GameObject _nearestPlanet;
+    [SerializeField] private PlanetScript _planetScript;
     [SerializeField] private float _planetMinDist;
     [SerializeField] private float _planetMaxDist;
     [SerializeField] private float _planetGravity = 9.8f;
@@ -13,16 +21,12 @@ public class ObjectGravity : MonoBehaviour
     [Header("Planets Calculations")]
     [SerializeField] private float _gravity;
     [SerializeField] private float _planetGravDist;
-    [SerializeField] private GameObject _nearestPlanet;
-    [SerializeField] private PlanetScript _planetScript;
 
     [Header("Gravity")]
     public bool grounded;
-    public float objectMass = 1.0f;
-    public float bounciness = 0.0f;
-    public float fallOff = 0.0f;
     public Vector3 velocity;
     public Vector3 downVector;
+    private Vector3 oldPos;
 
     [Header("Ray")]
     [SerializeField] private float _rayDist = 1.0f;
@@ -30,10 +34,8 @@ public class ObjectGravity : MonoBehaviour
 
     private void Start()
     {
-        _planetScript = _nearestPlanet.GetComponent<PlanetScript>();
-        _planetMinDist = _planetScript.minAttraDist;
-        _planetMaxDist = _planetScript.maxAttraDist;
-        _planetGravity = _planetScript.gravity;
+        gameObject.AddComponent<Rigidbody>();
+        gameObject.GetComponent<Rigidbody>().isKinematic = true;
     }
 
     void Update()
@@ -54,7 +56,7 @@ public class ObjectGravity : MonoBehaviour
         Debug.DrawRay(transform.position, downVector, Color.blue, 0.01f);
 
         float _playerPosition = Vector3.Distance(_nearestPlanet.transform.position, transform.position);
-        _playerPosition = Mathf.Clamp(_playerPosition, _planetMaxDist, _planetMinDist);
+        _playerPosition = Mathf.Clamp(_playerPosition, _planetMinDist, _planetMaxDist);
         float _playerPosNorm = (_playerPosition - _planetMaxDist) / (_planetMinDist - _planetMaxDist);
         _gravity = _planetGravity * _playerPosNorm;
     }
@@ -96,14 +98,37 @@ public class ObjectGravity : MonoBehaviour
         Vector3 deplacement = transform.forward * velocity.z + -downVector * velocity.y + transform.right * velocity.x;
         transform.localPosition += deplacement * Time.deltaTime;
 
-        Vector3 _direction = (_nearestPlanet.transform.position - transform.position).normalized;
-        Quaternion _newRotation = Quaternion.FromToRotation(-transform.up, _direction);
-        transform.rotation = _newRotation * transform.rotation;
+        //if(_nearestPlanet != null)
+        //{
+        //    Vector3 _direction = (_nearestPlanet.transform.position - transform.position).normalized;
+        //    Quaternion _newRotation = Quaternion.FromToRotation(-transform.up, _direction);
+        //    transform.rotation = _newRotation * transform.rotation;
+        //}
+
+        oldPos = transform.position;
 
         Debug.DrawRay(transform.position, transform.forward * velocity.x, Color.blue, 0.01f);
         Debug.DrawRay(transform.position, transform.right * velocity.z, Color.red, 0.01f);
         Debug.DrawRay(transform.position, transform.up * velocity.y, Color.green, 0.01f);
         Debug.DrawRay(transform.position, deplacement, Color.white, 0.01f);
+    }
+
+    public void AddPlanet(GameObject newPlanet)
+    {
+        _nearestPlanet = newPlanet;
+        _planetScript = _nearestPlanet.GetComponent<PlanetScript>();
+        _planetMinDist = _planetScript.minAttraDist;
+        _planetMaxDist = _planetScript.maxAttraDist;
+        _planetGravity = _planetScript.gravity;
+    }
+
+    public void RemovePlanet(GameObject newPlanet)
+    {
+        _nearestPlanet = null;
+        _planetScript = null;
+        _planetMinDist = 0;
+        _planetMaxDist = 0;
+        _planetGravity = 0;
     }
 
     public void AddImpulse(Vector3 impulse)
@@ -112,4 +137,6 @@ public class ObjectGravity : MonoBehaviour
         Vector3 deplacement = transform.forward * velocity.z + -downVector * velocity.y + transform.right * velocity.x;
         transform.localPosition += deplacement * Time.deltaTime;
     }
+
+
 }
