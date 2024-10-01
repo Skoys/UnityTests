@@ -432,7 +432,7 @@ Transform:
   m_GameObject: {fileID: 237990273}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 31, z: -86.7}
+  m_LocalPosition: {x: 136.9, y: 183.7, z: -80.4}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -460,11 +460,13 @@ MonoBehaviour:
   _planetMinDist: 0
   _planetMaxDist: 0
   _planetGravity: 0
+  _planetResistance: 0
   _gravity: 0
   _planetGravDist: 0
   grounded: 0
   velocity: {x: 0, y: 0, z: 10}
   downVector: {x: 0, y: 0, z: 0}
+  newVelo: {x: -100, y: 0, z: 100}
   _rayDist: 4.95
   _floorLayer:
     serializedVersion: 2
@@ -783,11 +785,13 @@ MonoBehaviour:
   _planetMinDist: 0
   _planetMaxDist: 0
   _planetGravity: 9.8
+  _planetResistance: 0
   _gravity: 0
   _planetGravDist: 0
   grounded: 0
   velocity: {x: 0, y: 0, z: 0}
   downVector: {x: 0, y: 0, z: 0}
+  newVelo: {x: 0, y: 0, z: 0}
   _rayDist: 0.95
   _floorLayer:
     serializedVersion: 2
@@ -912,9 +916,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7518cc5663bbbc845a7806718ce9636d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minAttraDist: 15
-  maxAttraDist: 45
+  minAttraDist: 15.8
+  maxAttraDist: 250
   gravity: 9.8
+  airResistance: 0.999
 --- !u!1 &500274491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,6 +1047,7 @@ MonoBehaviour:
   minAttraDist: 15
   maxAttraDist: 45
   gravity: 9.8
+  airResistance: 0.98
 --- !u!135 &682827317
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1122,7 +1128,7 @@ Transform:
   m_GameObject: {fileID: 682827315}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 91.9}
+  m_LocalPosition: {x: 0, y: 0, z: 300}
   m_LocalScale: {x: 30, y: 30, z: 30}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1711,7 +1717,7 @@ Transform:
   m_GameObject: {fileID: 1802085853}
   serializedVersion: 2
   m_LocalRotation: {x: 0.70710677, y: -0, z: -0, w: 0.7071069}
-  m_LocalPosition: {x: 0, y: 17.9, z: -38.5}
+  m_LocalPosition: {x: 0, y: 17.9, z: -334.9}
   m_LocalScale: {x: 15, y: 15, z: 15}
   m_ConstrainProportionsScale: 0
   m_Children: []
