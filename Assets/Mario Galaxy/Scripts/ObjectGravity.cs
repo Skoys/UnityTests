@@ -9,7 +9,7 @@ public class ObjectGravity : MonoBehaviour
     public bool rotationAffected = false;
     public float objectMass = 1.0f;
     public float bounciness = 0.0f;
-    public float fallOff = 0.0f;
+    public float fallOff = 0.99f;
 
     [Header("Planets Variables")]
     [SerializeField] private GameObject _nearestPlanet;
@@ -27,8 +27,6 @@ public class ObjectGravity : MonoBehaviour
     public bool grounded;
     public Vector3 velocity;
     public Vector3 downVector;
-    private Vector3 oldPos;
-    public Vector3 newVelo;
 
     [Header("Ray")]
     [SerializeField] private float _rayDist = 1.0f;
@@ -65,36 +63,26 @@ public class ObjectGravity : MonoBehaviour
 
     void CheckCollision()
     {
-        Ray ray = new Ray(transform.position, downVector);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray.origin, ray.direction, out hit, _rayDist, _floorLayer))
+        if (RayCollision())
         {
-            velocity.y = -velocity.y * bounciness;
             if(0.25f >velocity.y && velocity.y > -0.25f)
             {
-                velocity.y = 0;
+                velocity = Vector3.zero;
+                grounded = true;
             }
-            else
-            {
-                transform.Translate(new Vector3(0, _rayDist - hit.distance - 0.01f), Space.Self);
-            }
-            grounded = true;
         }
         else
         {
             grounded = false;
         }
-
-        Debug.DrawRay(ray.origin, ray.direction * _rayDist, Color.red, 0.01f);
     }
 
     void Gravity()
     {
 
-        newVelo += downVector * (_gravity * objectMass);
-        newVelo *= _planetResistance;
-        transform.position += newVelo * Time.deltaTime;
+        velocity += downVector * (_gravity * objectMass);
+        velocity *= _planetResistance;
+        transform.position += velocity * Time.deltaTime;
 
         //if (!grounded)
         //{
@@ -118,6 +106,34 @@ public class ObjectGravity : MonoBehaviour
         //Debug.DrawRay(transform.position, transform.right * velocity.z, Color.red, 0.01f);
         //Debug.DrawRay(transform.position, transform.up * velocity.y, Color.green, 0.01f);
         //Debug.DrawRay(transform.position, deplacement, Color.white, 0.01f);
+    }
+
+    private bool RayCollision()
+    {
+        bool result = false;
+        //if(Physics.Raycast(transform.position, transform.up, _rayDist, _floorLayer)) { result = true; velocity = new Vector3(velocity.x, -velocity.y, velocity.z) * fallOff; }
+        //if (Physics.Raycast(transform.position, -transform.up, _rayDist, _floorLayer)) { result = true; velocity = new Vector3(velocity.x, -velocity.y, velocity.z) * fallOff; }
+        //if (Physics.Raycast(transform.position, transform.forward, _rayDist, _floorLayer)) { result = true; velocity = new Vector3(velocity.x, velocity.y, -velocity.z) * fallOff; }
+        //if (Physics.Raycast(transform.position, -transform.forward, _rayDist, _floorLayer)) { result = true; velocity = new Vector3(velocity.x, -velocity.y, -velocity.z) * fallOff; }
+        //if (Physics.Raycast(transform.position, transform.right, _rayDist, _floorLayer)) { result = true; velocity = new Vector3(-velocity.x, velocity.y, velocity.z) * fallOff; }
+        //if (Physics.Raycast(transform.position, -transform.right, _rayDist, _floorLayer)) { result = true; velocity = new Vector3(-velocity.x, velocity.y, velocity.z) * fallOff; }
+        ////
+        //Debug.DrawRay(transform.position, transform.up * _rayDist, Color.green, 0.01f);
+        //Debug.DrawRay(transform.position, -transform.up * _rayDist, Color.green, 0.01f);
+        //Debug.DrawRay(transform.position, transform.forward * _rayDist, Color.blue, 0.01f);
+        //Debug.DrawRay(transform.position, -transform.forward * _rayDist, Color.blue, 0.01f);
+        //Debug.DrawRay(transform.position, transform.right * _rayDist, Color.red, 0.01f);
+        //Debug.DrawRay(transform.position, -transform.right * _rayDist, Color.red, 0.01f);
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, downVector, out hit, _rayDist, _floorLayer)) 
+        {
+            velocity = Vector3.Reflect(velocity, hit.normal);
+        }
+//
+        Debug.DrawRay(transform.position, transform.up * _rayDist, Color.green, 0.01f);
+        
+        return result;
     }
 
     public void AddPlanet(GameObject newPlanet)
