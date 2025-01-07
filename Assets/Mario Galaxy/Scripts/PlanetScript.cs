@@ -7,13 +7,13 @@ public class PlanetScript : MonoBehaviour
     public float minAttraDist;
     public float maxAttraDist;
     public float gravity = 9.8f;
+    public float airResistance = 0.98f;
 
     private void Start()
     {
         minAttraDist = transform.lossyScale.x * 0.5f;
         if(minAttraDist > transform.lossyScale.y) { minAttraDist = transform.lossyScale.y * 0.5f; }
         if(minAttraDist > transform .lossyScale.z) { minAttraDist = transform .lossyScale.z * 0.5f; }
-        maxAttraDist = minAttraDist * 3;
 
         gameObject.AddComponent<SphereCollider>();
         gameObject.GetComponent<SphereCollider>().isTrigger = true;
@@ -42,5 +42,7 @@ public class PlanetScript : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, maxAttraDist);
+        Gizmos.color = Color.gray;
+        Gizmos.DrawWireSphere(transform.position, minAttraDist);
     }
 }
