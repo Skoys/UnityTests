@@ -96,14 +96,14 @@ public class ObjectGravity : MonoBehaviour
         }
 
         Vector3 deplacement = transform.forward * velocity.z + -downVector * velocity.y + transform.right * velocity.x;
-        transform.localPosition += deplacement * Time.deltaTime;
+        transform.position += deplacement * Time.deltaTime;
 
-        //if(_nearestPlanet != null)
-        //{
-        //    Vector3 _direction = (_nearestPlanet.transform.position - transform.position).normalized;
-        //    Quaternion _newRotation = Quaternion.FromToRotation(-transform.up, _direction);
-        //    transform.rotation = _newRotation * transform.rotation;
-        //}
+        if (_nearestPlanet != null)
+        {
+            Vector3 _direction = (_nearestPlanet.transform.position - transform.position).normalized;
+            //Quaternion _newRotation = Quaternion.FromToRotation(-transform.up, _direction);
+            //transform.rotation = _newRotation * transform.rotation;
+        }
 
         oldPos = transform.position;
 
