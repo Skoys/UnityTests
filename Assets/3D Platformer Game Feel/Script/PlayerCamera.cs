@@ -51,6 +51,7 @@ public class PlayerCamera3D : MonoBehaviour
         gameObject.transform.RotateAround(player3D.gameObject.transform.position, new Vector3(1,0,0), currentCameraSpeed.y);
         gameObject.transform.RotateAround(player3D.gameObject.transform.position, new Vector3(0,1,0), currentCameraSpeed.x);
 
-        GetComponent<Camera>().transform.localEulerAngles = new Vector3(Mathf.Clamp(transform.localEulerAngles.x, maxUpDownCamera.x, maxUpDownCamera.y), transform.localEulerAngles.y, transform.localEulerAngles.z);
+        transform.eulerAngles = new Vector3(Mathf.Clamp(transform.eulerAngles.x, maxUpDownCamera.x, maxUpDownCamera.y), transform.eulerAngles.y, 0);
+        transform.LookAt(player3D.transform, transform.up);
     }
 }
