@@ -12,6 +12,7 @@ public class Player_Inputs : MonoBehaviour
     public bool pausePressed = false;
     public Vector2 movement = Vector2.zero;
     public Vector2 camMovement = Vector2.zero;
+    public float zoom = 0;
     public float menu = 0f;
     [SerializeField] private List<float[]> rumbleList = new List<float[]>();
 
@@ -57,6 +58,11 @@ public class Player_Inputs : MonoBehaviour
     public void CamMovement(InputAction.CallbackContext context)
     {
         camMovement = context.ReadValue<Vector2>();
+    }
+
+    public void Zoom(InputAction.CallbackContext context)
+    {
+        zoom = context.ReadValue<float>();
     }
 
     public void Menu(InputAction.CallbackContext context)

@@ -1,19 +1,36 @@
 using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCamera3D : MonoBehaviour
 {
-    [Header("Camera")]
+    [Header("Camera Movement")]
     [SerializeField] private Vector2 maxCameraSpeed = Vector2.one;
     [SerializeField] private Vector2 cameraAcceleration = Vector2.one;
-    [SerializeField] private Vector2 currentCameraSpeed = Vector2.one;
+    [SerializeField] private float cameraAccelerationSpeed;
+    [SerializeField] private Vector2 currentCameraPos = Vector2.one;
     [SerializeField] private Vector2 cameraInputs = Vector2.zero;
-    [SerializeField] private Vector2 maxUpDownCamera = Vector2.one;
+    [SerializeField] private Vector3 pivotPoint;
+    [SerializeField] private Vector2 maxTopDown;
+
+    [Header("Camera Distance")]
+    [SerializeField] private float distance;
+    [SerializeField] private Vector2 minMaxDistance = Vector2.one;
+    [SerializeField] private float zoomMultiplier;
+    [SerializeField] private float zoomInput;
 
     private Player_Inputs playerInputs;
     [SerializeField] private Player3D player3D;
+
+    public static PlayerCamera3D instance;
+
+    private void Awake()
+    {
+        if (instance == null) { instance = this; }
+        else { Destroy(gameObject); }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +49,7 @@ public class PlayerCamera3D : MonoBehaviour
     private void GetInputs()
     {
         cameraInputs = playerInputs.camMovement;
+        zoomInput = playerInputs.zoom;
     }
 
     private void UpdateCamera()
@@ -39,19 +57,32 @@ public class PlayerCamera3D : MonoBehaviour
         cameraInputs.x = Mathf.Clamp(cameraInputs.x, -0.75f, 0.75f);
         cameraInputs.y = Mathf.Clamp(cameraInputs.y, -0.75f, 0.75f);
 
-        cameraInputs.x *= maxCameraSpeed.x * -1;
-        cameraInputs.y *= maxCameraSpeed.y;
+        cameraAcceleration.x = Mathf.MoveTowards(cameraAcceleration.x, cameraInputs.x * (1 / 0.75f), cameraAccelerationSpeed * Time.deltaTime);
+        cameraAcceleration.y = Mathf.MoveTowards(cameraAcceleration.y, cameraInputs.y * (1 / 0.75f), cameraAccelerationSpeed * Time.deltaTime);
 
-        if (Mathf.Abs(cameraInputs.x) > 0.15f) { currentCameraSpeed.x = Mathf.Lerp(currentCameraSpeed.x, cameraInputs.x, cameraAcceleration.x * Time.deltaTime); }
-        else { currentCameraSpeed.x = Mathf.Lerp(currentCameraSpeed.x, 0, cameraAcceleration.x); }
+        cameraAcceleration.x = Mathf.Clamp(cameraAcceleration.x, -maxCameraSpeed.x, maxCameraSpeed.x);
+        cameraAcceleration.y = Mathf.Clamp(cameraAcceleration.y, -maxCameraSpeed.y, maxCameraSpeed.y);
 
-        if (Mathf.Abs(cameraInputs.y) > 0.15f) { currentCameraSpeed.y = Mathf.Lerp(currentCameraSpeed.y, cameraInputs.y, cameraAcceleration.y * Time.deltaTime); }
-        else { currentCameraSpeed.y = Mathf.Lerp(currentCameraSpeed.y, 0, cameraAcceleration.y); }
+        currentCameraPos += new Vector2(cameraAcceleration.x * maxCameraSpeed.x, cameraAcceleration.y * maxCameraSpeed.y) * Time .deltaTime;
+        currentCameraPos.y = Mathf.Clamp(currentCameraPos.y, maxTopDown.y, maxTopDown.x);
 
-        gameObject.transform.RotateAround(player3D.gameObject.transform.position, new Vector3(1,0,0), currentCameraSpeed.y);
-        gameObject.transform.RotateAround(player3D.gameObject.transform.position, new Vector3(0,1,0), currentCameraSpeed.x);
+        distance += zoomInput * zoomMultiplier * Time.deltaTime;
+        distance = Mathf.Clamp(distance, minMaxDistance.x, minMaxDistance.y);
 
-        transform.eulerAngles = new Vector3(Mathf.Clamp(transform.eulerAngles.x, maxUpDownCamera.x, maxUpDownCamera.y), transform.eulerAngles.y, 0);
-        transform.LookAt(player3D.transform, transform.up);
+        float D = Mathf.Sqrt(Mathf.Pow(distance * -10, 2) - Mathf.Pow(distance - (player3D.transform.position.y + pivotPoint.y - transform.position.y), 2));
+        float X = player3D.transform.position.x + pivotPoint.x + Mathf.Cos(currentCameraPos.x) * D;
+        float Z = player3D.transform.position.z + pivotPoint.z + Mathf.Sin(currentCameraPos.x) * D;
+        transform.position = new Vector3(X, player3D.transform.position.y + pivotPoint.y + currentCameraPos.y, Z);
+        transform.LookAt(player3D.transform.position + pivotPoint, transform.up);
+        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(player3D.transform.position + pivotPoint, 0.2f);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(player3D.transform.position + pivotPoint + new Vector3(0, maxTopDown.x), player3D.transform.position + pivotPoint + new Vector3(0, maxTopDown.y));
+        Gizmos.DrawLine(transform.position, new Vector3(player3D.transform.position.x + pivotPoint.x, transform.position.y, player3D.transform.position.z + pivotPoint.z));
     }
 }
