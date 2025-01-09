@@ -504,7 +504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movements: {x: 0, y: 0}
   speed: 4
-  rotationSpeed: 2
+  rotationSpeed: 20
   orientation: {fileID: 376971306}
   player_Inputs: {fileID: 0}
   camera3D: {fileID: 0}

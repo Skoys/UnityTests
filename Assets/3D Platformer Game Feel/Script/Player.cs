@@ -8,14 +8,20 @@ using UnityEngine.InputSystem.XInput;
 
 public class Player3D : MonoBehaviour
 {
+    [Header("Movements")]
     [SerializeField] private Vector2 movements = Vector2.zero;
-
     [SerializeField] private float speed = 4;
     [SerializeField] private float rotationSpeed = 2;
     [SerializeField] private Transform orientation;
 
+    [Header("Jump")]
+    [SerializeField] private bool jumpPressed;
+    private bool alreadyPressed;
+    [SerializeField] private float jumpBufferMaxTime;
+    private float currentJumpBufferTime;
+    [SerializeField] private float groundTestDistance;
+
     private Rigidbody rb;
-    public Joystick joystick;
 
     [SerializeField] private Player_Inputs player_Inputs;
     [SerializeField] private PlayerCamera3D camera3D;
@@ -38,11 +44,13 @@ public class Player3D : MonoBehaviour
     {
         GetInputs();
         Movement();
+        Jump();
     }
 
     private void GetInputs()
     {
         movements = player_Inputs.movement;
+        jumpPressed = player_Inputs.jumpPressed;
     }
 
     private void Movement()
@@ -57,6 +65,20 @@ public class Player3D : MonoBehaviour
             transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * rotationSpeed);
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
 
-        transform.position += direction * speed * Time.deltaTime;
+        float absMovement = Mathf.Clamp(Mathf.Abs(movements.x) + Mathf.Abs(movements.y), 0, 1);
+        transform.position += transform.forward * absMovement * speed * Time.deltaTime;
+    }
+
+    private void Jump()
+    {
+        if (jumpPressed)
+        {
+            if(!alreadyPressed) { currentJumpBufferTime = Time.time; alreadyPressed = true; }
+        }
+        else
+        {
+            currentJumpBufferTime = 0;
+            alreadyPressed = false;
+        }
     }
 }
