@@ -20,10 +20,14 @@ public class Player3D : MonoBehaviour
     [SerializeField] private float jumpBufferMaxTime;
     private float currentJumpBufferTime;
     [SerializeField] private float groundTestDistance;
+    [SerializeField] private int playerMask;
+    [Tooltip("X = Normal, Y = Jumping, Z = Falling")]
+    [SerializeField] private Vector3 gravityJump = Vector3.one;
 
     private Rigidbody rb;
 
     [SerializeField] private Player_Inputs player_Inputs;
+    [SerializeField] private ObjectGravity objectGravity;
     [SerializeField] private PlayerCamera3D camera3D;
     public static Player3D instance;
 
@@ -36,6 +40,7 @@ public class Player3D : MonoBehaviour
     void Start()
     {
         player_Inputs = Player_Inputs.instance;
+        objectGravity = GetComponent<ObjectGravity>();
         camera3D = PlayerCamera3D.instance;
         rb = GetComponent<Rigidbody>();
     }
@@ -69,16 +74,38 @@ public class Player3D : MonoBehaviour
         transform.position += transform.forward * absMovement * speed * Time.deltaTime;
     }
 
+    private bool CheckGround()
+    {
+        Ray ray;
+        if(Physics.Raycast(transform.position, Vector3.down, groundTestDistance, playerMask))
+        {
+            objectGravity.objectMass = gravityJump.x;
+            return true;
+        }
+        return false;
+    }
+
     private void Jump()
     {
         if (jumpPressed)
         {
             if(!alreadyPressed) { currentJumpBufferTime = Time.time; alreadyPressed = true; }
+            if(currentJumpBufferTime <= Time.time + jumpBufferMaxTime && CheckGround())
+            {
+                objectGravity.objectMass = gravityJump.y;
+                objectGravity.AddImpulse(new Vector3(0, 10, 0));
+            }
         }
         else
         {
-            currentJumpBufferTime = 0;
+            currentJumpBufferTime = Mathf.Infinity;
             alreadyPressed = false;
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundTestDistance);
     }
 }
