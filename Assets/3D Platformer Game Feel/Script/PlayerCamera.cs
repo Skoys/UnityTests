@@ -48,7 +48,7 @@ public class PlayerCamera3D : MonoBehaviour
 
     private void GetInputs()
     {
-        cameraInputs = playerInputs.camMovement;
+        cameraInputs = playerInputs.camMovement * -1;
         zoomInput = playerInputs.zoom;
     }
 
@@ -73,7 +73,7 @@ public class PlayerCamera3D : MonoBehaviour
         float X = player3D.transform.position.x + pivotPoint.x + Mathf.Cos(currentCameraPos.x) * D;
         float Z = player3D.transform.position.z + pivotPoint.z + Mathf.Sin(currentCameraPos.x) * D;
         transform.position = new Vector3(X, player3D.transform.position.y + pivotPoint.y + currentCameraPos.y, Z);
-        transform.LookAt(player3D.transform.position + pivotPoint, transform.up);
+        transform.LookAt(player3D.transform.position + pivotPoint, player3D.transform.up);
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
     }
 

@@ -21,8 +21,8 @@ public class ObjectGravity : MonoBehaviour
     [SerializeField] private PlanetScript.PlanetShape planetShape;
 
     [Header("Planets Calculations")]
-    [SerializeField] private float _gravity;
-    [SerializeField] private float _planetGravDist;
+    public float gravity;
+    public float planetGravDist;
 
     [Header("Gravity")]
     public bool grounded;
@@ -39,7 +39,7 @@ public class ObjectGravity : MonoBehaviour
     {
         gameObject.AddComponent<Rigidbody>();
         gameObject.GetComponent<Rigidbody>().isKinematic = true;
-        objectLayer = gameObject.layer;
+        gameObject.GetComponent<Rigidbody>().useGravity = false;
     }
 
     void Update()
@@ -74,7 +74,7 @@ public class ObjectGravity : MonoBehaviour
 
         _playerPosition = Mathf.Clamp(_playerPosition, _planetMinDist, _planetMaxDist);
         float _playerPosNorm = (_playerPosition - _planetMaxDist) / (_planetMinDist - _planetMaxDist);
-        _gravity = _planetGravity * _playerPosNorm;
+        gravity = _planetGravity * _playerPosNorm;
     }
 
     void CheckCollision()
@@ -94,51 +94,32 @@ public class ObjectGravity : MonoBehaviour
     {
         if (!grounded)
         {
-            velocity += downVector * (_gravity * objectMass);
+            velocity += downVector * (gravity * objectMass);
             velocity *= _planetResistance;
             transform.position += velocity * Time.deltaTime;
         }
-
-        //if (!grounded)
-        //{
-        //    velocity.y -= _gravity * objectMass * Time.deltaTime;
-        //    if (velocity.y > 100) { velocity.y = 100; }
-        //}
-
-        //Vector3 deplacement = transform.forward * velocity.z + -downVector * velocity.y + transform.right * velocity.x;
-        //transform.localPosition += deplacement * Time.deltaTime;
-
-        //if (_nearestPlanet != null)
-        //{
-        //    Vector3 _direction = (_nearestPlanet.transform.position - transform.position).normalized;
-        //    Quaternion _newRotation = Quaternion.FromToRotation(-transform.up, _direction);
-        //    transform.rotation = _newRotation * transform.rotation;
-        //}
-
-        //oldPos = transform.position;
-
-        //Debug.DrawRay(transform.position, transform.forward * velocity.x, Color.blue, 0.01f);
-        //Debug.DrawRay(transform.position, transform.right * velocity.z, Color.red, 0.01f);
-        //Debug.DrawRay(transform.position, transform.up * velocity.y, Color.green, 0.01f);
-        //Debug.DrawRay(transform.position, deplacement, Color.white, 0.01f);
     }
 
     private bool RayCollision()
     {
         bool result = false;
 
-        if(Vector3.Distance(lastPoint, transform.position) < groundDistance)
-        {
-            transform.position = lastPoint - downVector * (groundDistance - 0.01f);
-            velocity.y = 0;
-            result = true;
-        }
-
         RaycastHit hit;
         if (Physics.Raycast(transform.position, downVector, out hit, _rayDist, objectLayer)) 
         {
             //velocity = Vector3.Reflect(velocity, hit.normal) * bounciness;
             lastPoint = hit.point;
+        }
+        else
+        {
+            lastPoint = Vector3.positiveInfinity;
+        }
+
+        if (Vector3.Distance(lastPoint, transform.position) < groundDistance)
+        {
+            transform.position = lastPoint - downVector * (groundDistance - 0.01f);
+            velocity.y = 0;
+            result = true;
         }
         return result;
     }
@@ -164,7 +145,7 @@ public class ObjectGravity : MonoBehaviour
         _planetResistance = 1;
         planetShape = 0;
 
-        _gravity = 0;
+        gravity = 0;
     }
 
     public void AddImpulse(Vector3 impulse)

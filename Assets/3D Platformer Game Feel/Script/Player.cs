@@ -16,11 +16,14 @@ public class Player3D : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] private bool jumpPressed;
-    private bool alreadyPressed;
+    public bool alreadyPressed;
+    public bool isJumping;
     [SerializeField] private float jumpBufferMaxTime;
     private float currentJumpBufferTime;
-    [SerializeField] private float groundTestDistance;
+    [SerializeField] private float jumpUpMaxTime;
+    public float currentJumpUpTime;
     [SerializeField] private int playerMask;
+    [SerializeField] private float jumpForce;
     [Tooltip("X = Normal, Y = Jumping, Z = Falling")]
     [SerializeField] private Vector3 gravityJump = Vector3.one;
 
@@ -68,21 +71,21 @@ public class Player3D : MonoBehaviour
 
         if (direction != Vector3.zero)
             transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * rotationSpeed);
-        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+        transform.rotation = Quaternion.LookRotation(transform.forward, transform.up);
 
         float absMovement = Mathf.Clamp(Mathf.Abs(movements.x) + Mathf.Abs(movements.y), 0, 1);
         transform.position += transform.forward * absMovement * speed * Time.deltaTime;
+
+        if (CheckGround()) { objectGravity.objectMass = gravityJump.x; }
+        else
+        {
+            if(objectGravity.velocity.y < -0.1f) objectGravity.objectMass = gravityJump.z;
+        }
     }
 
     private bool CheckGround()
     {
-        Ray ray;
-        if(Physics.Raycast(transform.position, Vector3.down, groundTestDistance, playerMask))
-        {
-            objectGravity.objectMass = gravityJump.x;
-            return true;
-        }
-        return false;
+        return objectGravity.grounded;
     }
 
     private void Jump()
@@ -90,22 +93,29 @@ public class Player3D : MonoBehaviour
         if (jumpPressed)
         {
             if(!alreadyPressed) { currentJumpBufferTime = Time.time; alreadyPressed = true; }
-            if(currentJumpBufferTime <= Time.time + jumpBufferMaxTime && CheckGround())
+            if(currentJumpBufferTime >= Time.time - jumpBufferMaxTime && CheckGround())
             {
                 objectGravity.objectMass = gravityJump.y;
-                objectGravity.AddImpulse(new Vector3(0, 10, 0));
+                objectGravity.AddImpulse(new Vector3(0, jumpForce * objectGravity.gravity, 0));
+                currentJumpBufferTime = Time.time;
+                isJumping = true;
+            }
+            if (isJumping && currentJumpBufferTime >= Time.time - jumpBufferMaxTime)
+            {
+                objectGravity.AddImpulse(new Vector3(0, jumpForce * Time.deltaTime, 0));
             }
         }
         else
         {
             currentJumpBufferTime = Mathf.Infinity;
             alreadyPressed = false;
+            isJumping = false;
         }
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundTestDistance);
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward);
     }
 }

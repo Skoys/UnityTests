@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 5790341}
   - component: {fileID: 5790340}
   - component: {fileID: 5790339}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Planet_Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -461,15 +461,17 @@ MonoBehaviour:
   _planetMaxDist: 0
   _planetGravity: 0
   _planetResistance: 1
-  _gravity: 0
-  _planetGravDist: 0
+  planetShape: 0
+  gravity: 0
+  planetGravDist: 0
   grounded: 0
-  velocity: {x: -10, y: 0, z: 10}
+  groundDistance: 0
+  velocity: {x: -30, y: 0, z: 30}
   downVector: {x: 0, y: 0, z: 0}
   _rayDist: 4.95
-  _floorLayer:
+  objectLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 0
 --- !u!1 &241144101
 GameObject:
   m_ObjectHideFlags: 3
@@ -577,7 +579,7 @@ GameObject:
   - component: {fileID: 400513269}
   - component: {fileID: 400513268}
   - component: {fileID: 400513267}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Planet_Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -785,15 +787,17 @@ MonoBehaviour:
   _planetMaxDist: 0
   _planetGravity: 9.8
   _planetResistance: 0
-  _gravity: 0
-  _planetGravDist: 0
+  planetShape: 0
+  gravity: 0
+  planetGravDist: 0
   grounded: 0
+  groundDistance: 0
   velocity: {x: 0, y: 0, z: 0}
   downVector: {x: 0, y: 0, z: 0}
   _rayDist: 0.95
-  _floorLayer:
+  objectLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 0
 --- !u!1 &480160289
 GameObject:
   m_ObjectHideFlags: 0
@@ -807,7 +811,7 @@ GameObject:
   - component: {fileID: 480160291}
   - component: {fileID: 480160290}
   - component: {fileID: 480160294}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: Planet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -918,6 +922,7 @@ MonoBehaviour:
   maxAttraDist: 250
   gravity: 9.8
   airResistance: 0.999
+  planetShape: 1
 --- !u!1 &500274491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,6 +1051,7 @@ MonoBehaviour:
   maxAttraDist: 45
   gravity: 9.8
   airResistance: 0.98
+  planetShape: 1
 --- !u!135 &682827317
 SphereCollider:
   m_ObjectHideFlags: 0
