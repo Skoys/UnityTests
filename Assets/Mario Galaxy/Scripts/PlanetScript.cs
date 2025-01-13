@@ -47,13 +47,16 @@ public class PlanetScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-            other.GetComponent<ObjectGravity>().AddPlanet(gameObject, planetShape);
-            Debug.Log("RigidBody entered");
+        ObjectGravity objectGravity = other.GetComponent<ObjectGravity>();
+        if (objectGravity == null) return;
+        objectGravity.AddPlanet(gameObject, planetShape);
     }
 
     private void OnTriggerExit(Collider other)
     {
-            other.GetComponent<ObjectGravity>().RemovePlanet(gameObject);
+        ObjectGravity objectGravity = other.GetComponent<ObjectGravity>();
+        if (objectGravity == null) return;
+        objectGravity.RemovePlanet(gameObject);
     }
 
     private void OnDrawGizmos()

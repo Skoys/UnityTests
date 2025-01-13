@@ -8,7 +8,7 @@ public class Player_Inputs : MonoBehaviour
     public bool jumpPressed = false;
     public bool attackPressed = false;
     public bool interactionPressed = false;
-    public bool throwPressed = false;
+    public bool dashPressed = false;
     public bool pausePressed = false;
     public Vector2 movement = Vector2.zero;
     public Vector2 camMovement = Vector2.zero;
@@ -85,9 +85,9 @@ public class Player_Inputs : MonoBehaviour
         interactionPressed = context.ReadValue<float>() > 0 ? true : false;
     }
     
-    public void Throw(InputAction.CallbackContext context)
+    public void Dash(InputAction.CallbackContext context)
     {
-        throwPressed = context.ReadValue<float>() > 0 ? true : false;
+        dashPressed = context.ReadValue<float>() > 0 ? true : false;
     }
 
     public void Pause(InputAction.CallbackContext context)

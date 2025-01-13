@@ -29,7 +29,7 @@ public class ObjectGravity : MonoBehaviour
     public float groundDistance;
     public Vector3 velocity;
     public Vector3 downVector;
-    private Vector3 lastPoint;
+    public Vector3 lastPoint;
 
     [Header("Ray")]
     [SerializeField] private float _rayDist = 1.0f;
