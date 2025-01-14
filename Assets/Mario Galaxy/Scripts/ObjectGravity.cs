@@ -46,6 +46,10 @@ public class ObjectGravity : MonoBehaviour
     {
         PlanetCalculations();
         CheckCollision();
+    }
+
+    private void FixedUpdate()
+    {
         Gravity();
     }
 

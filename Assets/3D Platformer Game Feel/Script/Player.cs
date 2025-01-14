@@ -1,3 +1,4 @@
+using UniSense;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
@@ -16,17 +17,17 @@ public class Player3D : MonoBehaviour
     [SerializeField] private bool jumpPressed;
     public bool allowedToJump;
     public bool isJumping;
-    [SerializeField] private float jumpBufferMaxTime;
-    private float currentJumpBufferTime;
-    [SerializeField] private float jumpUpMaxTime;
-    public float currentJumpUpTime;
+    [SerializeField] private float jumpBufferMaxTime, currentJumpBufferTime;
+    public float jumpUpMaxTime ,currentJumpUpTime;
     [SerializeField] private int playerMask;
     [SerializeField] private float jumpForce;
+    [SerializeField] private float maxCoyoteTime, currentCoyoteTime;
     [Tooltip("X = Normal, Y = Jumping, Z = Falling")]
     [SerializeField] private Vector3 gravityJump = Vector3.one;
 
     [Header("Dash")]
-    [SerializeField] private bool dashPressed;
+    [SerializeField] private float dashPressed;
+    [SerializeField] private bool allowedToDash;
     [SerializeField] private bool canDash;
     [SerializeField] private Vector3 dashImpulse = Vector3.one;
 
@@ -98,19 +99,22 @@ public class Player3D : MonoBehaviour
         float _speed = currentRunTime < runTime ? speed.x : speed.y;
         transform.position += transform.forward * absMovement * _speed * Time.deltaTime;
 
-        if (absMovement > 0.5f)
+        if (absMovement > 0.75f)
         {
-            currentRunTime += Time.deltaTime;
             if (!runRumbleActivated && currentRunTime >= runTime && CheckGround())
             {
                 runRumbleActivated = true;
                 player_Inputs.AddRumble(new Vector2(runRumble.x, runRumble.y), runRumble.z);
             }
+            else if (currentRunTime < 4)
+            {
+                currentRunTime += Time.deltaTime;
+            }
         }
         else
         {
-            currentRunTime = 0;
-            runRumbleActivated = false;
+            currentRunTime = Mathf.MoveTowards(currentRunTime, 0, Time.deltaTime * 2);
+            if(currentRunTime< 0.1f) runRumbleActivated = false;
         }
 
         if (CheckGround()) { objectGravity.objectMass = gravityJump.x; }
@@ -154,24 +158,57 @@ public class Player3D : MonoBehaviour
 
     private void Dash()
     {
-        if(dashPressed && canDash)
+        
+        if (dashPressed > 0.45f && canDash && allowedToDash)
         {
             objectGravity.velocity = Vector3.zero;
             allowedToJump = true;
+            allowedToDash = false;
             canDash = false;
             Vector3 _impulse = transform.up * dashImpulse.y + transform.forward * dashImpulse.z;
             objectGravity.AddImpulse(_impulse);
             player_Inputs.AddRumble(new Vector2(dashRumble.x, dashRumble.y), dashRumble.z);
+            //DashTrigger(false);
         }
-        if (!canDash) canDash = CheckGround();
+        if (!canDash) 
+        { 
+            canDash = CheckGround();
+            //if(canDash)DashTrigger(canDash);
+        }
+        if (dashPressed < 0.1f) allowedToDash = true;
+    }
+
+    private void DashTrigger(bool isActive)
+    {
+        DualSenseGamepadState _state = player_Inputs.state;
+        if (canDash)
+        {
+            DualSenseTriggerState rightTrigger = new();
+            DualSenseSectionResistanceProperties rightResistance = new();
+            rightResistance.StartPosition = 25;
+            rightResistance.EndPosition = 50;
+            rightResistance.Force = 50;
+            rightTrigger.Section = rightResistance;
+            rightTrigger.EffectType = DualSenseTriggerEffectType.SectionResistance;
+            _state.RightTrigger = rightTrigger;
+            Debug.Log("Unlocked");
+        }
+        else
+        {
+            DualSenseTriggerState rightTrigger = new();
+            rightTrigger.EffectType = DualSenseTriggerEffectType.NoResistance;
+            _state.RightTrigger = rightTrigger;
+            Debug.Log("Locked");
+        }
+        player_Inputs.ChangeState(_state);
     }
 
     private void Vfx()
     {
         if (CheckGround())
         {
-            if (currentRunTime > runTime) { runVFX.Play(); walkVFX.Stop(); }
-            else if (currentRunTime > 0) { walkVFX.Play(); runVFX.Stop(); }
+            if (currentRunTime > runTime) { runVFX.Play(); }
+            else if (currentRunTime > 0) { walkVFX.Play(); }
             else { walkVFX.Stop(); runVFX.Stop(); }
         }
     }
