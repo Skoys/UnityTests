@@ -6,6 +6,7 @@ using UnityEngine.VFX;
 public class Player3D : MonoBehaviour
 {
     [Header("Movements")]
+    [SerializeField] private Transform playerGravity;
     [SerializeField] private Vector2 movements = Vector2.zero;
     [SerializeField] private Vector2 speed = Vector2.zero;
     [SerializeField] private float rotationSpeed = 2;
@@ -59,8 +60,9 @@ public class Player3D : MonoBehaviour
 
     void Start()
     {
+        playerGravity = transform.parent.transform;
         player_Inputs = Player_Inputs.instance;
-        objectGravity = GetComponent<ObjectGravity>();
+        objectGravity = playerGravity.GetComponent<ObjectGravity>();
         camera3D = PlayerCamera3D.instance;
         rb = GetComponent<Rigidbody>();
 
@@ -93,12 +95,15 @@ public class Player3D : MonoBehaviour
         direction.Normalize();
 
         if (direction != Vector3.zero)
+        {
             transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * rotationSpeed);
-        transform.rotation = Quaternion.LookRotation(transform.forward, transform.up);
+            transform.localRotation = Quaternion.LookRotation(transform.forward, transform.up);
+            transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
+        }
 
         float absMovement = Mathf.Clamp(Mathf.Abs(movements.x) + Mathf.Abs(movements.y), 0, 1);
         float _speed = currentRunTime < runTime ? speed.x : speed.y;
-        transform.position += transform.forward * absMovement * _speed * Time.deltaTime;
+        playerGravity.position += transform.forward * absMovement * _speed * Time.deltaTime;
 
         if (absMovement > 0.75f)
         {
@@ -124,7 +129,8 @@ public class Player3D : MonoBehaviour
             if (objectGravity.velocity.y < -0.1f) objectGravity.objectMass = gravityJump.z;
         }
 
-        shadowDecal.transform.position = objectGravity.lastPoint - objectGravity.downVector.normalized * 0.5f;
+        if (objectGravity.lastPoint != Vector3.positiveInfinity)
+            shadowDecal.transform.position = objectGravity.lastPoint - objectGravity.downVector.normalized * 0.5f;
      }
 
     private bool CheckGround()
@@ -216,7 +222,7 @@ public class Player3D : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.up * dashImpulse.y + transform.forward * dashImpulse.z);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, transform.position + orientation.forward * 2);
     }
 }

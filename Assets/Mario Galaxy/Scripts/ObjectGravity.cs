@@ -105,7 +105,6 @@ public class ObjectGravity : MonoBehaviour
             //transform.position += velocity * Time.deltaTime;
             //transform.position = Vector3.Lerp(transform.position, transform.position + velocity, Time.deltaTime);
         }
-        transform.up = Vector3.Slerp(transform.up, -downVector, Time.fixedDeltaTime);
     }
 
     private bool RayCollision()
@@ -167,6 +166,6 @@ public class ObjectGravity : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(lastPoint, 0.5f);
-        Gizmos.DrawRay(transform.position, downVector * _rayDist);
+        Gizmos.DrawRay(transform.position, downVector * 2);
     }
 }
