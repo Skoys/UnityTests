@@ -46,6 +46,8 @@ public class ObjectGravity : MonoBehaviour
     {
         PlanetCalculations();
         CheckCollision();
+        transform.position = Vector3.Lerp(transform.position, transform.position + velocity, Time.deltaTime);
+        
     }
 
     private void FixedUpdate()
@@ -100,8 +102,10 @@ public class ObjectGravity : MonoBehaviour
         {
             velocity += downVector * (gravity * objectMass);
             velocity *= _planetResistance;
-            transform.position += velocity * Time.deltaTime;
+            //transform.position += velocity * Time.deltaTime;
+            //transform.position = Vector3.Lerp(transform.position, transform.position + velocity, Time.deltaTime);
         }
+        transform.up = Vector3.Slerp(transform.up, -downVector, Time.fixedDeltaTime);
     }
 
     private bool RayCollision()

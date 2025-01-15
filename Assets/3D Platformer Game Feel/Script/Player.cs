@@ -27,13 +27,14 @@ public class Player3D : MonoBehaviour
 
     [Header("Dash")]
     [SerializeField] private float dashPressed;
-    [SerializeField] private bool allowedToDash;
+    [SerializeField] private bool dashWasReleased;
     [SerializeField] private bool canDash;
     [SerializeField] private Vector3 dashImpulse = Vector3.one;
 
     [Header("VFX")]
     [SerializeField] private VisualEffect walkVFX;
     [SerializeField] private VisualEffect runVFX;
+    [SerializeField] private VisualEffect dashVFX;
 
     [Header("Rumbles")]
     [Tooltip("X = Left/Low, Y = Right/High, Z = Time || Left Big Vibrations, Right Small Vibrations")]
@@ -158,24 +159,24 @@ public class Player3D : MonoBehaviour
 
     private void Dash()
     {
-        
-        if (dashPressed > 0.45f && canDash && allowedToDash)
+        if (!canDash)
+        {
+            canDash = CheckGround();
+            //if(canDash)DashTrigger(canDash);
+        }
+        if (dashPressed > 0.45f && canDash && dashWasReleased)
         {
             objectGravity.velocity = Vector3.zero;
             allowedToJump = true;
-            allowedToDash = false;
+            dashWasReleased = false;
             canDash = false;
             Vector3 _impulse = transform.up * dashImpulse.y + transform.forward * dashImpulse.z;
             objectGravity.AddImpulse(_impulse);
             player_Inputs.AddRumble(new Vector2(dashRumble.x, dashRumble.y), dashRumble.z);
+            dashVFX.Play();
             //DashTrigger(false);
         }
-        if (!canDash) 
-        { 
-            canDash = CheckGround();
-            //if(canDash)DashTrigger(canDash);
-        }
-        if (dashPressed < 0.1f) allowedToDash = true;
+        if (dashPressed < 0.1f) dashWasReleased = true;
     }
 
     private void DashTrigger(bool isActive)
@@ -207,7 +208,7 @@ public class Player3D : MonoBehaviour
     {
         if (CheckGround())
         {
-            if (currentRunTime > runTime) { runVFX.Play(); }
+            if (runRumbleActivated) { runVFX.Play(); }
             else if (currentRunTime > 0) { walkVFX.Play(); }
             else { walkVFX.Stop(); runVFX.Stop(); }
         }

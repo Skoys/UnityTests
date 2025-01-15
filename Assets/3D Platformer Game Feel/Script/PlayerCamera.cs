@@ -72,7 +72,7 @@ public class PlayerCamera3D : MonoBehaviour
         float D = Mathf.Sqrt(Mathf.Pow(distance * -10, 2) - Mathf.Pow(distance - (player3D.transform.position.y + pivotPoint.y - transform.position.y), 2));
         float X = player3D.transform.position.x + pivotPoint.x + Mathf.Cos(currentCameraPos.x) * D;
         float Z = player3D.transform.position.z + pivotPoint.z + Mathf.Sin(currentCameraPos.x) * D;
-        transform.position = Vector3.Lerp(transform.position, new Vector3(X, player3D.transform.position.y + pivotPoint.y + currentCameraPos.y, Z), Time.deltaTime * 3);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(X, player3D.transform.position.y + pivotPoint.y + currentCameraPos.y, Z), Time.deltaTime * 10);
         transform.LookAt(player3D.transform.position + pivotPoint, player3D.transform.up);
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
     }
