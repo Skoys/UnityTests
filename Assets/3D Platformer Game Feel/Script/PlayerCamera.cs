@@ -46,6 +46,11 @@ public class PlayerCamera3D : MonoBehaviour
         UpdateCamera();
     }
 
+    private void LateUpdate()
+    {
+        
+    }
+
     private void GetInputs()
     {
         cameraInputs = playerInputs.camMovement * -1;

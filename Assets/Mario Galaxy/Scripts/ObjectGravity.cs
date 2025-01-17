@@ -158,7 +158,7 @@ public class ObjectGravity : MonoBehaviour
     public void AddImpulse(Vector3 impulse)
     {
         velocity += impulse;
-        Vector3 deplacement = transform.forward * velocity.z + -downVector * velocity.y + transform.right * velocity.x;
+        Vector3 deplacement = transform.forward * velocity.z + transform.up * velocity.y + transform.right * velocity.x;
         transform.localPosition += deplacement * Time.deltaTime;
     }
 

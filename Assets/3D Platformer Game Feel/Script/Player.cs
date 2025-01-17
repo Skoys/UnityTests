@@ -152,7 +152,7 @@ public class Player3D : MonoBehaviour
             }
             if (isJumping && currentJumpBufferTime >= Time.time - jumpBufferMaxTime)
             {
-                objectGravity.AddImpulse(new Vector3(0, jumpForce * Time.deltaTime, 0));
+                objectGravity.AddImpulse(new Vector3(0, jumpForce * 15 * Time.deltaTime, 0));
             }
         }
         else
