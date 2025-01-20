@@ -6,7 +6,6 @@ using UnityEngine.VFX;
 public class Player3D : MonoBehaviour
 {
     [Header("Movements")]
-    [SerializeField] private Transform playerGravity;
     [SerializeField] private Vector2 movements = Vector2.zero;
     [SerializeField] private Vector2 speed = Vector2.zero;
     [SerializeField] private float rotationSpeed = 2;
@@ -49,7 +48,6 @@ public class Player3D : MonoBehaviour
     [SerializeField] private Player_Inputs player_Inputs;
     [SerializeField] private ObjectGravity objectGravity;
     [SerializeField] private PlayerCamera3D camera3D;
-    private Rigidbody rb;
     public static Player3D instance;
 
     private void Awake()
@@ -60,11 +58,9 @@ public class Player3D : MonoBehaviour
 
     void Start()
     {
-        playerGravity = transform.parent.transform;
         player_Inputs = Player_Inputs.instance;
-        objectGravity = playerGravity.GetComponent<ObjectGravity>();
+        objectGravity = GetComponent<ObjectGravity>();
         camera3D = PlayerCamera3D.instance;
-        rb = GetComponent<Rigidbody>();
 
         InputSystem.pollingFrequency = 120;
     }
@@ -97,13 +93,13 @@ public class Player3D : MonoBehaviour
         if (direction != Vector3.zero)
         {
             transform.forward = Vector3.Slerp(transform.forward, direction, Time.deltaTime * rotationSpeed);
-            transform.localRotation = Quaternion.LookRotation(transform.forward, transform.up);
+            transform.localRotation = Quaternion.LookRotation(transform.forward, -objectGravity.downAxis);
             transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
         }
 
         float absMovement = Mathf.Clamp(Mathf.Abs(movements.x) + Mathf.Abs(movements.y), 0, 1);
         float _speed = currentRunTime < runTime ? speed.x : speed.y;
-        playerGravity.position += transform.forward * absMovement * _speed * Time.deltaTime;
+        objectGravity.addedMovement = transform.forward * absMovement * _speed;
 
         if (absMovement > 0.75f)
         {
@@ -130,7 +126,7 @@ public class Player3D : MonoBehaviour
         }
 
         if (objectGravity.lastPoint != Vector3.positiveInfinity)
-            shadowDecal.transform.position = objectGravity.lastPoint - objectGravity.downVector.normalized * 0.5f;
+            shadowDecal.transform.position = objectGravity.lastPoint - objectGravity.downAxis.normalized * 0.5f;
      }
 
     private bool CheckGround()
@@ -152,7 +148,7 @@ public class Player3D : MonoBehaviour
             }
             if (isJumping && currentJumpBufferTime >= Time.time - jumpBufferMaxTime)
             {
-                objectGravity.AddImpulse(new Vector3(0, jumpForce * 15 * Time.deltaTime, 0));
+                objectGravity.AddImpulse(new Vector3(0, jumpForce * Time.deltaTime, 0));
             }
         }
         else
@@ -176,7 +172,7 @@ public class Player3D : MonoBehaviour
             allowedToJump = true;
             dashWasReleased = false;
             canDash = false;
-            Vector3 _impulse = transform.up * dashImpulse.y + transform.forward * dashImpulse.z;
+            Vector3 _impulse = -objectGravity.downAxis * dashImpulse.y + transform.forward * dashImpulse.z;
             objectGravity.AddImpulse(_impulse);
             player_Inputs.AddRumble(new Vector2(dashRumble.x, dashRumble.y), dashRumble.z);
             dashVFX.Play();

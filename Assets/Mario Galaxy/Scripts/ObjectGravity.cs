@@ -1,3 +1,4 @@
+using CustomGravity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,29 +7,22 @@ public class ObjectGravity : MonoBehaviour
 {
 
     [Header("Object variable")]
-    public bool rotationAffected = false;
     public float objectMass = 1.0f;
-    public float bounciness = 0.0f;
-    public float fallOff = 0.99f;
+    public Vector3 addedMovement;
+    private Rigidbody rb;
 
     [Header("Planets Variables")]
-    [SerializeField] private GameObject _nearestPlanet;
-    [SerializeField] private PlanetScript _planetScript;
-    [SerializeField] private float _planetMinDist;
-    [SerializeField] private float _planetMaxDist;
-    [SerializeField] private float _planetGravity = 9.8f;
-    [SerializeField] private float _planetResistance = 0f;
-    [SerializeField] private PlanetScript.PlanetShape planetShape;
+    [SerializeField] private Planet planet;
 
     [Header("Planets Calculations")]
     public float gravity;
-    public float planetGravDist;
 
     [Header("Gravity")]
     public bool grounded;
     public float groundDistance;
     public Vector3 velocity;
-    public Vector3 downVector;
+    public Vector3 movementVelocity;
+    public Vector3 downAxis;
     public Vector3 lastPoint;
 
     [Header("Ray")]
@@ -37,128 +31,73 @@ public class ObjectGravity : MonoBehaviour
 
     private void Start()
     {
-        gameObject.AddComponent<Rigidbody>();
-        gameObject.GetComponent<Rigidbody>().isKinematic = true;
-        gameObject.GetComponent<Rigidbody>().useGravity = false;
+        rb = gameObject.GetComponent<Rigidbody>();
+        rb.isKinematic = false;
+        rb.useGravity = false;
     }
 
     void Update()
     {
-        PlanetCalculations();
-        CheckCollision();
-        transform.position = Vector3.Lerp(transform.position, transform.position + velocity, Time.deltaTime);
-        
+        movementVelocity = addedMovement;
+        rb.velocity = velocity + movementVelocity;
+        velocity += downAxis * gravity * objectMass * Time.fixedDeltaTime;
     }
 
     private void FixedUpdate()
     {
-        Gravity();
+        PlanetCalculations();
     }
 
     void PlanetCalculations()
     {
-        if (_nearestPlanet == null)
+        switch (planet.Shape)
         {
-            downVector = new Vector3(0, -1, 0);
-            return;
-        }
+            case PlanetShape.Void:
+                downAxis = new Vector3(0, 0, 0);
+                return;
 
-        float _playerPosition = 0;
-        switch (planetShape)
-        {
-            case PlanetScript.PlanetShape.Flat:
-                downVector = new Vector3(0, -1, 0);
-                _playerPosition = transform.position.y - _nearestPlanet.transform.position.y;
+            case PlanetShape.Flat:
+                downAxis = new Vector3(0, -1, 0);
                 break;
 
-            case PlanetScript.PlanetShape.Round:
-                downVector = (_nearestPlanet.transform.position - transform.position).normalized;
-                _playerPosition = Vector3.Distance(_nearestPlanet.transform.position, transform.position);
+            case PlanetShape.Round:
+                downAxis = (planet.Transform.position - transform.position).normalized;
                 break;
         }
-        Debug.DrawRay(transform.position, downVector, Color.blue, 0.01f);
+        Debug.DrawRay(transform.position, downAxis, Color.blue, 0.01f);
 
-        _playerPosition = Mathf.Clamp(_playerPosition, _planetMinDist, _planetMaxDist);
-        float _playerPosNorm = (_playerPosition - _planetMaxDist) / (_planetMinDist - _planetMaxDist);
-        gravity = _planetGravity * _playerPosNorm;
-    }
-
-    void CheckCollision()
-    {
-        if (RayCollision())
-        {
-            velocity = Vector3.zero;
-            grounded = true;
-        }
-        else
-        {
-            grounded = false;
-        }
-    }
-
-    void Gravity()
-    {
-        if (!grounded)
-        {
-            velocity += downVector * (gravity * objectMass);
-            velocity *= _planetResistance;
-            //transform.position += velocity * Time.deltaTime;
-            //transform.position = Vector3.Lerp(transform.position, transform.position + velocity, Time.deltaTime);
-        }
-    }
-
-    private bool RayCollision()
-    {
-        bool result = false;
+        gravity = planet.AttractionForce;
 
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, downVector, out hit, _rayDist, objectLayer)) 
-        {
-            //velocity = Vector3.Reflect(velocity, hit.normal) * bounciness;
+        if(Physics.Raycast(transform.position, downAxis, out hit, _rayDist, objectLayer)) 
+        { 
+            if(hit.distance > groundDistance) return;
+            velocity = Vector3.zero; 
+            transform.position = hit.point + groundDistance * -downAxis;
+            grounded = true;
             lastPoint = hit.point;
         }
-        else
-        {
-            lastPoint = Vector3.positiveInfinity;
-        }
-
-        if (Vector3.Distance(lastPoint, transform.position) < groundDistance)
-        {
-            transform.position = lastPoint - downVector * (groundDistance - 0.01f);
-            velocity.y = 0;
-            result = true;
-        }
-        return result;
     }
 
-    public void AddPlanet(GameObject newPlanet, PlanetScript.PlanetShape _planetShape)
+    private Vector3 ProjectDirectionOnPlane(Vector3 direction, Vector3 normal)
     {
-        _nearestPlanet = newPlanet;
-        _planetScript = _nearestPlanet.GetComponent<PlanetScript>();
-        _planetMinDist = _planetScript.minAttraDist;
-        _planetMaxDist = _planetScript.maxAttraDist;
-        _planetGravity = _planetScript.gravity;
-        _planetResistance = _planetScript.airResistance;
-        planetShape = _planetShape;
+        return (direction - normal * Vector3.Dot(direction, normal)).normalized;
     }
 
-    public void RemovePlanet(GameObject newPlanet)
+    public void AddPlanet(Planet _newPlanet)
     {
-        _nearestPlanet = null;
-        _planetScript = null;
-        _planetMinDist = 1;
-        _planetMaxDist = 1;
-        _planetGravity = 0;
-        _planetResistance = 1;
-        planetShape = 0;
+        planet = _newPlanet;
+    }
 
-        gravity = 0;
+    public void RemovePlanet()
+    {
+        planet.Shape = PlanetShape.Void;
     }
 
     public void AddImpulse(Vector3 impulse)
     {
+        Vector3 deplacement = transform.forward * velocity.z + -downAxis * velocity.y + transform.right * velocity.x;
         velocity += impulse;
-        Vector3 deplacement = transform.forward * velocity.z + transform.up * velocity.y + transform.right * velocity.x;
         transform.localPosition += deplacement * Time.deltaTime;
     }
 
@@ -166,6 +105,6 @@ public class ObjectGravity : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(lastPoint, 0.5f);
-        Gizmos.DrawRay(transform.position, downVector * 2);
+        Gizmos.DrawRay(transform.position, downAxis * 2);
     }
 }

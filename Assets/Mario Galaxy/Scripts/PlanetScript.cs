@@ -1,21 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
+using CustomGravity;
 using UnityEngine;
 
 public class PlanetScript : MonoBehaviour
 {
     public float minAttraDist;
     public float maxAttraDist;
-    public float gravity = 9.8f;
+    public float attractionForce = 9.8f;
     public float airResistance = 0.98f;
-    public PlanetShape planetShape; 
+    public PlanetShape planetShape;
 
-    public enum PlanetShape
-    {
-        Null,
-        Round,
-        Flat,
-    }
+    public Planet planet = new();
 
     private void Start()
     {
@@ -31,6 +25,13 @@ public class PlanetScript : MonoBehaviour
                 gameObject.GetComponent<SphereCollider>().radius = maxAttraDist / transform.lossyScale.x;
                 break;
         }
+
+        planet.Transform = transform;
+        planet.AttractionForce = attractionForce;
+        planet.AirResistance = airResistance;
+        planet.AttractionDistance.minimumDistance = minAttraDist;
+        planet.AttractionDistance.maximumDistance = maxAttraDist;
+        planet.Shape = planetShape;
     }
 
     private void Update()
@@ -49,14 +50,14 @@ public class PlanetScript : MonoBehaviour
     {
         ObjectGravity objectGravity = other.GetComponent<ObjectGravity>();
         if (objectGravity == null) return;
-        objectGravity.AddPlanet(gameObject, planetShape);
+        objectGravity.AddPlanet(planet);
     }
 
     private void OnTriggerExit(Collider other)
     {
         ObjectGravity objectGravity = other.GetComponent<ObjectGravity>();
         if (objectGravity == null) return;
-        objectGravity.RemovePlanet(gameObject);
+        objectGravity.RemovePlanet();
     }
 
     private void OnDrawGizmos()
